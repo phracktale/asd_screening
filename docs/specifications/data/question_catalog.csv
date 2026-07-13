@@ -1,0 +1,53 @@
+code,section,domain,label_fr,periods,age_routes,response_scale,required_for_completion
+A1.01,A,A1,"Difficulté à initier un échange sans objectif concret",current|childhood,child|adolescent|adult,0-4|unknown|NA,false
+A1.02,A,A1,"Difficulté à maintenir un échange réciproque",current|childhood,child|adolescent|adult,0-4|unknown|NA,false
+A1.03,A,A1,"Difficulté à partager spontanément intérêts, plaisir ou émotions",current|childhood,toddler|child|adolescent|adult,0-4|unknown|NA,false
+A1.04,A,A1,"Réponses sociales perçues comme trop faibles, trop intenses ou décalées",current|childhood,toddler|child|adolescent|adult,0-4|unknown|NA,false
+A1.05,A,A1,"Tendance à trop se confier ou à ne presque rien partager",current|childhood,adolescent|adult,0-4|unknown|NA,false
+A1.06,A,A1,"Fatigue ou saturation rapide pendant les interactions",current|childhood,child|adolescent|adult,0-4|unknown|NA,false
+A2.01,A,A2,"Contact visuel inconfortable, évité, forcé ou difficile à doser",current|childhood,toddler|child|adolescent|adult,0-4|unknown|NA,false
+A2.02,A,A2,"Difficulté à interpréter expressions faciales, posture, gestes ou ton de voix",current|childhood,child|adolescent|adult,0-4|unknown|NA,false
+A2.03,A,A2,"Décalage entre contenu verbal et expression non verbale",current|childhood,child|adolescent|adult,0-4|unknown|NA,false
+A2.04,A,A2,"Difficulté à utiliser spontanément les gestes pour communiquer",current|childhood,toddler|child|adolescent|adult,0-4|unknown|NA,false
+A2.05,A,A2,"Expression faciale ou prosodie jugée inhabituelle",current|childhood,child|adolescent|adult,0-4|unknown|NA,false
+A2.06,A,A2,"Besoin de contrôler consciemment regard, posture ou expressions",current,adolescent|adult,0-4|unknown|NA,false
+A3.01,A,A3,"Difficulté à se faire des amis ou à comprendre la construction d'une relation",current|childhood,child|adolescent|adult,0-4|unknown|NA,false
+A3.02,A,A3,"Difficulté à entretenir les liens sans raison pratique",current,adolescent|adult,0-4|unknown|NA,false
+A3.03,A,A3,"Difficulté à adapter le comportement à différents contextes sociaux",current|childhood,child|adolescent|adult,0-4|unknown|NA,false
+A3.04,A,A3,"Compréhension tardive des faux pas ou attentes implicites",current|childhood,child|adolescent|adult,0-4|unknown|NA,false
+A3.05,A,A3,"Difficulté avec les conversations informelles, rites sociaux ou politesses",current|childhood,adolescent|adult,0-4|unknown|NA,false
+A3.06,A,A3,"Préférence pour des relations structurées ou centrées sur un intérêt",current|childhood,child|adolescent|adult,0-4|unknown|NA,false
+B1.01,B,B1,"Gestes répétitifs, balancements, tapotements ou manipulation constante d'objets",current|childhood,toddler|child|adolescent|adult,0-4|unknown|NA,false
+B1.02,B,B1,"Répétition de mots, phrases, sons, dialogues ou mélodies",current|childhood,toddler|child|adolescent|adult,0-4|unknown|NA,false
+B1.03,B,B1,"Jeux ou scénarios répétitifs et peu variables",current|childhood,toddler|child|adolescent|adult,0-4|unknown|NA,false
+B1.04,B,B1,"Besoin d'aligner, classer ou disposer certains objets précisément",current|childhood,toddler|child|adolescent|adult,0-4|unknown|NA,false
+B1.05,B,B1,"Comportements répétitifs utilisés pour se calmer ou se concentrer",current|childhood,child|adolescent|adult,0-4|unknown|NA,false
+B2.01,B,B2,"Détresse face à un changement inattendu",current|childhood,toddler|child|adolescent|adult,0-4|unknown|NA,false
+B2.02,B,B2,"Besoin d'anticiper précisément les événements",current|childhood,child|adolescent|adult,0-4|unknown|NA,false
+B2.03,B,B2,"Routines ou procédures personnelles difficiles à modifier",current|childhood,toddler|child|adolescent|adult,0-4|unknown|NA,false
+B2.04,B,B2,"Pensée rigide ou difficulté à envisager plusieurs solutions",current|childhood,adolescent|adult,0-4|unknown|NA,false
+B2.05,B,B2,"Réaction intense quand l'ordre ou la séquence attendue est perturbé",current|childhood,toddler|child|adolescent|adult,0-4|unknown|NA,false
+B3.01,B,B3,"Intérêts très intenses ou absorbants",current|childhood,child|adolescent|adult,0-4|unknown|NA,false
+B3.02,B,B3,"Accumulation exhaustive d'informations sur certains sujets",current|childhood,child|adolescent|adult,0-4|unknown|NA,false
+B3.03,B,B3,"Difficulté à interrompre une activité liée à un intérêt",current|childhood,child|adolescent|adult,0-4|unknown|NA,false
+B3.04,B,B3,"Tendance à ramener les échanges vers un domaine d'intérêt",current|childhood,child|adolescent|adult,0-4|unknown|NA,false
+B3.05,B,B3,"Investissement disproportionné au détriment d'autres activités",current|childhood,adolescent|adult,0-4|unknown|NA,false
+B4.01,B,B4,"Hypersensibilité aux sons",current|childhood,toddler|child|adolescent|adult,0-4|unknown|NA,false
+B4.02,B,B4,"Hypersensibilité à la lumière ou à certains motifs visuels",current|childhood,toddler|child|adolescent|adult,0-4|unknown|NA,false
+B4.03,B,B4,"Hypersensibilité aux textures, vêtements, contacts ou températures",current|childhood,toddler|child|adolescent|adult,0-4|unknown|NA,false
+B4.04,B,B4,"Sensibilité aux odeurs ou goûts",current|childhood,toddler|child|adolescent|adult,0-4|unknown|NA,false
+B4.05,B,B4,"Recherche de pression, mouvement ou stimulation tactile",current|childhood,toddler|child|adolescent|adult,0-4|unknown|NA,false
+B4.06,B,B4,"Réaction faible à la douleur, au froid, à la faim ou aux signaux corporels",current|childhood,toddler|child|adolescent|adult,0-4|unknown|NA,false
+B4.07,B,B4,"Surcharge dans les environnements riches en stimuli",current|childhood,child|adolescent|adult,0-4|unknown|NA,false
+E.01,E,differential,"TDAH connu ou suspecté",lifetime,child|adolescent|adult,known|suspected|no|unknown,false
+E.02,E,differential,"Anxiété sociale connue ou suspectée",lifetime,child|adolescent|adult,known|suspected|no|unknown,false
+E.03,E,differential,"Dépression connue ou suspectée",lifetime,adolescent|adult,known|suspected|no|unknown,false
+E.04,E,differential,"TOC connu ou suspecté",lifetime,child|adolescent|adult,known|suspected|no|unknown,false
+E.05,E,differential,"Psychotraumatisme connu ou suspecté",lifetime,child|adolescent|adult,known|suspected|no|unknown,false
+E.06,E,differential,"Trouble du langage ou déficience sensorielle",lifetime,toddler|child|adolescent|adult,known|suspected|no|unknown,false
+F.01,F,camouflaging,"Préparation de scripts avant une interaction",current,adolescent|adult,0-4|unknown|NA,false
+F.02,F,camouflaging,"Imitation volontaire des comportements sociaux",current,adolescent|adult,0-4|unknown|NA,false
+F.03,F,camouflaging,"Forçage du contact visuel ou des expressions",current,adolescent|adult,0-4|unknown|NA,false
+F.04,F,camouflaging,"Analyse consciente des règles sociales",current,adolescent|adult,0-4|unknown|NA,false
+F.05,F,camouflaging,"Écart entre fonctionnement public et épuisement privé",current,adolescent|adult,0-4|unknown|NA,false
+F.06,F,camouflaging,"Impression de jouer un rôle social",current,adolescent|adult,0-4|unknown|NA,false

@@ -1,0 +1,44 @@
+{
+  "_comment": "Registre de licences des instruments (specification 6.11, chap. 0). La reproduction des items d'un instrument protege est interdite tant que 'items_displayable' est faux. Un professionnel peut toutefois saisir un score obtenu ailleurs. A tenir a jour par l'administration scientifique.",
+  "records": [
+    {
+      "instrument_code": "AQ-10-adult",
+      "instrument_name": "Autism Spectrum Quotient (10 items) - adulte",
+      "rights_holder": "Autism Research Centre, University of Cambridge",
+      "source_url": "https://docs.autismresearchcentre.com/tests/AQ10.pdf",
+      "status": "license_required",
+      "items_displayable": false,
+      "scoring_allowed": false,
+      "score_entry_allowed": true,
+      "threshold": 6,
+      "item_count": 10,
+      "notes": "Formulaire protege par copyright. Ne pas afficher ni recalculer les items sans droits verifies. Saisie du score par un professionnel autorisee. Un seuil de 6 conduit a envisager une evaluation specialisee; il ne confirme pas un TSA."
+    },
+    {
+      "instrument_code": "Q-CHAT-10-toddler",
+      "instrument_name": "Quantitative Checklist for Autism in Toddlers (10 items)",
+      "rights_holder": "Autism Research Centre, University of Cambridge",
+      "source_url": "https://www.autismresearchcentre.com/tests/",
+      "status": "license_required",
+      "items_displayable": false,
+      "scoring_allowed": false,
+      "score_entry_allowed": true,
+      "threshold": 3,
+      "item_count": 10,
+      "notes": "Droits et traduction francaise a verifier avant integration. Aucun item ne doit etre reformule sous le meme nom sans autorisation."
+    },
+    {
+      "instrument_code": "M-CHAT-R-F",
+      "instrument_name": "Modified Checklist for Autism in Toddlers, Revised with Follow-up",
+      "rights_holder": "Robins, Fein, & Barton",
+      "source_url": "https://www.mchatscreen.com/mchat-rf/",
+      "status": "license_required",
+      "items_displayable": false,
+      "scoring_allowed": false,
+      "score_entry_allowed": true,
+      "threshold": null,
+      "item_count": 20,
+      "notes": "Distribution dans un logiciel soumise a licence. Interdiction de modifier les items et obligation de conserver le copyright."
+    }
+  ]
+}

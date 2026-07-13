@@ -1,0 +1,9 @@
+/vendor/
+/.phpunit.cache/
+*.log
+.env
+.env.local
+.DS_Store
+/node_modules/
+__pycache__/
+*.pyc

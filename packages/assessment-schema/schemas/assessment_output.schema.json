@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/tsa-assessment-output-v1.json",
+  "title": "Sortie d'une évaluation de repérage TSA",
+  "type": "object",
+  "required": ["assessment_id", "generated_at", "completeness", "clinical_structure", "orientation", "disclaimer"],
+  "properties": {
+    "assessment_id": {"type": "string", "format": "uuid"},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "form_version": {"type": "string"},
+    "completeness": {
+      "type": "object",
+      "required": ["level", "answered_ratio"],
+      "properties": {
+        "level": {"enum": ["sufficient", "partial", "insufficient"]},
+        "answered_ratio": {"type": "number", "minimum": 0, "maximum": 1},
+        "developmental_history": {"enum": ["sufficient", "partial", "missing"]},
+        "informant_available": {"type": "boolean"},
+        "contradictions": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "psychometric_results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["instrument_code", "version", "score"],
+        "properties": {
+          "instrument_code": {"type": "string"},
+          "version": {"type": "string"},
+          "score": {"type": "number"},
+          "official_interpretation": {"type": ["string", "null"]},
+          "licensed": {"type": "boolean"}
+        }
+      }
+    },
+    "clinical_structure": {
+      "type": "object",
+      "properties": {
+        "A1": {"$ref": "#/$defs/domain"},
+        "A2": {"$ref": "#/$defs/domain"},
+        "A3": {"$ref": "#/$defs/domain"},
+        "B1": {"$ref": "#/$defs/domain"},
+        "B2": {"$ref": "#/$defs/domain"},
+        "B3": {"$ref": "#/$defs/domain"},
+        "B4": {"$ref": "#/$defs/domain"},
+        "developmental_onset": {"$ref": "#/$defs/domain"},
+        "functional_impact": {"$ref": "#/$defs/domain"},
+        "differential_exploration": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["code", "status"],
+            "properties": {
+              "code": {"type": "string"},
+              "status": {"enum": ["known", "suspected", "not_reported", "unknown"]},
+              "comment": {"type": ["string", "null"]}
+            }
+          }
+        }
+      }
+    },
+    "ml_estimate": {
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "required": ["model_version", "abstained"],
+          "properties": {
+            "model_version": {"type": "string"},
+            "probability": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
+            "risk_band": {"enum": ["low", "intermediate", "high", "indeterminate", null]},
+            "uncertainty": {"type": ["number", "null"], "minimum": 0},
+            "calibrated": {"type": "boolean"},
+            "abstained": {"type": "boolean"},
+            "abstention_reason": {"type": ["string", "null"]},
+            "domain_validity": {"type": ["string", "null"]},
+            "warnings": {"type": "array", "items": {"type": "string"}}
+          }
+        }
+      ]
+    },
+    "orientation": {
+      "type": "object",
+      "required": ["level", "message"],
+      "properties": {
+        "level": {"enum": ["low", "intermediate", "high", "indeterminate", "urgent"]},
+        "message": {"type": "string"},
+        "recommended_actions": {"type": "array", "items": {"type": "string"}},
+        "urgent_reason": {"type": ["string", "null"]}
+      }
+    },
+    "evidence_trace": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["statement_id", "evidence_type", "source_refs"],
+        "properties": {
+          "statement_id": {"type": "string"},
+          "evidence_type": {"enum": ["explicit_response", "document_quote", "direct_summary", "inference"]},
+          "source_refs": {"type": "array", "items": {"type": "string"}},
+          "confidence": {"enum": ["low", "medium", "high"]}
+        }
+      }
+    },
+    "disclaimer": {"type": "string"}
+  },
+  "$defs": {
+    "domain": {
+      "type": "object",
+      "required": ["status", "confidence", "evidence_count"],
+      "properties": {
+        "status": {"enum": ["documented", "possibly_documented", "not_documented", "contradictory", "not_assessed"]},
+        "confidence": {"enum": ["low", "medium", "high"]},
+        "evidence_count": {"type": "integer", "minimum": 0},
+        "contradiction_count": {"type": "integer", "minimum": 0},
+        "summary": {"type": ["string", "null"]},
+        "source_refs": {"type": "array", "items": {"type": "string"}}
+      }
+    }
+  },
+  "additionalProperties": false
+}

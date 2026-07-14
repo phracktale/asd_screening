@@ -56,7 +56,33 @@ final class CatalogLoaderTest extends TestCase
     {
         $form = $this->load();
 
-        self::assertFalse($form->get('F.01')?->appliesTo(AgeBand::Child));
-        self::assertTrue($form->get('F.01')?->appliesTo(AgeBand::Adult));
+        // Section E = camouflage (aligne sur la spec 6.8 apres correction E/F).
+        self::assertSame('camouflaging', $form->get('E.01')?->domain);
+        self::assertFalse($form->get('E.01')?->appliesTo(AgeBand::Child));
+        self::assertTrue($form->get('E.01')?->appliesTo(AgeBand::Adult));
+    }
+
+    #[Test]
+    public function sections_and_domains_are_consistent(): void
+    {
+        $form = $this->load();
+
+        // Correspondance section -> domaines autorises (review P1-1).
+        $allowed = [
+            'A' => ['A1', 'A2', 'A3'],
+            'B' => ['B1', 'B2', 'B3', 'B4'],
+            'E' => ['camouflaging'],
+            'F' => ['differential'],
+        ];
+
+        foreach ($form->questions as $q) {
+            if (isset($allowed[$q->section])) {
+                self::assertContains(
+                    $q->domain,
+                    $allowed[$q->section],
+                    \sprintf('Item %s : domaine %s incoherent avec la section %s', $q->code, $q->domain, $q->section),
+                );
+            }
+        }
     }
 }

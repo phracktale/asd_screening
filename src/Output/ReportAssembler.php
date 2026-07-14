@@ -74,7 +74,9 @@ final class ReportAssembler
             'answered_ratio' => $completeness->answeredRatio,
             'developmental_history' => $completeness->developmentalHistory,
             'informant_available' => $completeness->informantAvailable,
-            'contradictions' => $completeness->contradictions,
+            'blocks' => $completeness->blocks,
+            // Cle "contradictions" conservee pour le schema ; contenu = divergences temporelles.
+            'contradictions' => $completeness->discrepancies,
         ];
     }
 
@@ -105,6 +107,10 @@ final class ReportAssembler
             }
         }
         $out['differential_exploration'] = $structure->differentialExploration;
+        $out['differential_uncertainty'] = $structure->differentialUncertainty->value;
+        if ($structure->camouflaging !== null) {
+            $out['camouflaging'] = $this->mapDomain($structure->camouflaging);
+        }
 
         return $out;
     }
@@ -134,6 +140,8 @@ final class ReportAssembler
             'message' => $orientation->message,
             'recommended_actions' => $orientation->recommendedActions,
             'urgent_reason' => $orientation->urgentReason,
+            'graded_level_validated' => $orientation->gradedLevelValidated,
+            'notes' => $orientation->notes,
         ];
     }
 

@@ -16,6 +16,7 @@
         "answered_ratio": {"type": "number", "minimum": 0, "maximum": 1},
         "developmental_history": {"enum": ["sufficient", "partial", "missing"]},
         "informant_available": {"type": "boolean"},
+        "blocks": {"type": "object", "additionalProperties": {"type": "boolean"}},
         "contradictions": {"type": "array", "items": {"type": "string"}}
       }
     },
@@ -45,6 +46,8 @@
         "B4": {"$ref": "#/$defs/domain"},
         "developmental_onset": {"$ref": "#/$defs/domain"},
         "functional_impact": {"$ref": "#/$defs/domain"},
+        "camouflaging": {"$ref": "#/$defs/domain"},
+        "differential_uncertainty": {"enum": ["none", "limited", "significant", "unresolved"]},
         "differential_exploration": {
           "type": "array",
           "items": {
@@ -86,7 +89,9 @@
         "level": {"enum": ["low", "intermediate", "high", "indeterminate", "urgent"]},
         "message": {"type": "string"},
         "recommended_actions": {"type": "array", "items": {"type": "string"}},
-        "urgent_reason": {"type": ["string", "null"]}
+        "urgent_reason": {"type": ["string", "null"]},
+        "graded_level_validated": {"type": "boolean"},
+        "notes": {"type": "array", "items": {"type": "string"}}
       }
     },
     "evidence_trace": {

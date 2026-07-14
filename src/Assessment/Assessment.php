@@ -32,8 +32,21 @@ final class Assessment
         }
     }
 
+    /**
+     * Enregistre une reponse. Unicite par (question_code, period) : une nouvelle
+     * reponse pour le meme couple remplace la precedente (upsert, review P1-12).
+     * Ainsi le resultat ne depend plus de l'ordre d'insertion.
+     */
     public function addResponse(Response $response): void
     {
+        foreach ($this->responses as $index => $existing) {
+            if ($existing->questionCode === $response->questionCode && $existing->period === $response->period) {
+                $this->responses[$index] = $response;
+                $this->responses = array_values($this->responses);
+
+                return;
+            }
+        }
         $this->responses[] = $response;
     }
 

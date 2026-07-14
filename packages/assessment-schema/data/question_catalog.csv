@@ -39,15 +39,15 @@ B4.04,B,B4,"Sensibilité aux odeurs ou goûts",current|childhood,toddler|child|a
 B4.05,B,B4,"Recherche de pression, mouvement ou stimulation tactile",current|childhood,toddler|child|adolescent|adult,0-4|unknown|NA,false
 B4.06,B,B4,"Réaction faible à la douleur, au froid, à la faim ou aux signaux corporels",current|childhood,toddler|child|adolescent|adult,0-4|unknown|NA,false
 B4.07,B,B4,"Surcharge dans les environnements riches en stimuli",current|childhood,child|adolescent|adult,0-4|unknown|NA,false
-E.01,E,differential,"TDAH connu ou suspecté",lifetime,child|adolescent|adult,known|suspected|no|unknown,false
-E.02,E,differential,"Anxiété sociale connue ou suspectée",lifetime,child|adolescent|adult,known|suspected|no|unknown,false
-E.03,E,differential,"Dépression connue ou suspectée",lifetime,adolescent|adult,known|suspected|no|unknown,false
-E.04,E,differential,"TOC connu ou suspecté",lifetime,child|adolescent|adult,known|suspected|no|unknown,false
-E.05,E,differential,"Psychotraumatisme connu ou suspecté",lifetime,child|adolescent|adult,known|suspected|no|unknown,false
-E.06,E,differential,"Trouble du langage ou déficience sensorielle",lifetime,toddler|child|adolescent|adult,known|suspected|no|unknown,false
-F.01,F,camouflaging,"Préparation de scripts avant une interaction",current,adolescent|adult,0-4|unknown|NA,false
-F.02,F,camouflaging,"Imitation volontaire des comportements sociaux",current,adolescent|adult,0-4|unknown|NA,false
-F.03,F,camouflaging,"Forçage du contact visuel ou des expressions",current,adolescent|adult,0-4|unknown|NA,false
-F.04,F,camouflaging,"Analyse consciente des règles sociales",current,adolescent|adult,0-4|unknown|NA,false
-F.05,F,camouflaging,"Écart entre fonctionnement public et épuisement privé",current,adolescent|adult,0-4|unknown|NA,false
-F.06,F,camouflaging,"Impression de jouer un rôle social",current,adolescent|adult,0-4|unknown|NA,false
+E.01,E,camouflaging,"Préparation de scripts avant une interaction",current,adolescent|adult,0-4|unknown|NA,false
+E.02,E,camouflaging,"Imitation volontaire des comportements sociaux",current,adolescent|adult,0-4|unknown|NA,false
+E.03,E,camouflaging,"Forçage du contact visuel ou des expressions",current,adolescent|adult,0-4|unknown|NA,false
+E.04,E,camouflaging,"Analyse consciente des règles sociales",current,adolescent|adult,0-4|unknown|NA,false
+E.05,E,camouflaging,"Écart entre fonctionnement public et épuisement privé",current,adolescent|adult,0-4|unknown|NA,false
+E.06,E,camouflaging,"Impression de jouer un rôle social",current,adolescent|adult,0-4|unknown|NA,false
+F.01,F,differential,"TDAH connu ou suspecté",lifetime,child|adolescent|adult,diagnosed|suspected|under_evaluation|ruled_out|not_reported|unknown,false
+F.02,F,differential,"Anxiété sociale connue ou suspectée",lifetime,child|adolescent|adult,diagnosed|suspected|under_evaluation|ruled_out|not_reported|unknown,false
+F.03,F,differential,"Dépression connue ou suspectée",lifetime,adolescent|adult,diagnosed|suspected|under_evaluation|ruled_out|not_reported|unknown,false
+F.04,F,differential,"TOC connu ou suspecté",lifetime,child|adolescent|adult,diagnosed|suspected|under_evaluation|ruled_out|not_reported|unknown,false
+F.05,F,differential,"Psychotraumatisme connu ou suspecté",lifetime,child|adolescent|adult,diagnosed|suspected|under_evaluation|ruled_out|not_reported|unknown,false
+F.06,F,differential,"Trouble du langage ou déficience sensorielle",lifetime,toddler|child|adolescent|adult,diagnosed|suspected|under_evaluation|ruled_out|not_reported|unknown,false

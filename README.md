@@ -6,6 +6,10 @@ Application de **repérage et d'orientation** du trouble du spectre de l'autisme
 > calcule les scores d'instruments *lorsque la licence le permet*, produit une synthèse
 > explicable et estime un **niveau de suspicion** (faible / intermédiaire / élevé / **indéterminé**).
 > Seul un professionnel compétent peut conclure à un TSA après évaluation complète.
+>
+> ℹ️ La **graduation** faible/intermédiaire/élevé repose sur des seuils **non encore validés
+> cliniquement** : elle sort marquée comme prototype (`graded_level_validated: false`) et sera
+> activable une fois validée sur cohorte. Voir [`docs/KNOWN_ISSUES.md`](docs/KNOWN_ISSUES.md).
 
 La spécification complète (clinique, scientifique, fonctionnelle, technique) se trouve dans
 [`docs/specifications/`](docs/specifications/).

@@ -9,8 +9,8 @@ use TsaRepere\Form\FormDefinition;
 use TsaRepere\Form\Period;
 
 /**
- * Evalue la completude (specification 7.2). Cet indice conditionne la capacite
- * de l'application a conclure ou a repondre "indetermine".
+ * Evalue la completude par blocs (specification 7.2, review P1-9). Cet indice
+ * conditionne la capacite de l'application a conclure ou a repondre "indetermine".
  */
 final class CompletenessEvaluator
 {
@@ -43,25 +43,60 @@ final class CompletenessEvaluator
             default => Completeness::DEV_MISSING,
         };
 
-        $contradictions = $this->collectContradictions($structure);
-
-        $level = $this->deriveLevel($answeredRatio, $developmental);
+        $blocks = $this->blocks($structure, $developmental, $assessment);
+        $discrepancies = $this->collectDiscrepancies($structure);
 
         return new Completeness(
-            level: $level,
+            level: $this->deriveLevel($answeredRatio, $blocks),
             answeredRatio: round($answeredRatio, 3),
             developmentalHistory: $developmental,
             informantAvailable: $assessment->hasExternalInformant(),
-            contradictions: $contradictions,
+            blocks: $blocks,
+            discrepancies: $discrepancies,
         );
     }
 
-    private function deriveLevel(float $answeredRatio, string $developmental): string
+    /**
+     * @return array<string, bool>
+     */
+    private function blocks(ClinicalStructure $structure, string $developmental, Assessment $assessment): array
     {
-        if ($answeredRatio < 0.3 || ($answeredRatio < 0.5 && $developmental === Completeness::DEV_MISSING)) {
+        $socialAssessed = $this->countAssessed($structure, ['A1', 'A2', 'A3']);
+        $rrbAssessed = $this->countAssessed($structure, ['B1', 'B2', 'B3', 'B4']);
+
+        $differentialReviewed = false;
+        foreach ($structure->differentialExploration as $entry) {
+            if (!\in_array($entry['status'], ['not_reported', 'unknown'], true)) {
+                $differentialReviewed = true;
+                break;
+            }
+        }
+
+        return [
+            'core_social_complete' => $socialAssessed >= 2,
+            'core_rrb_complete' => $rrbAssessed >= 2,
+            'developmental_history_complete' => $developmental === Completeness::DEV_SUFFICIENT,
+            'functional_impact_complete' => ($structure->domain('functional_impact')?->status ?? DomainStatus::NotAssessed) !== DomainStatus::NotAssessed,
+            'differential_review_complete' => $differentialReviewed,
+            'informant_evidence_complete' => $assessment->hasExternalInformant(),
+        ];
+    }
+
+    /**
+     * @param array<string, bool> $blocks
+     */
+    private function deriveLevel(float $answeredRatio, array $blocks): string
+    {
+        $coreCovered = $blocks['core_social_complete'] && $blocks['core_rrb_complete'];
+
+        if ($answeredRatio < 0.3 || !$coreCovered) {
             return Completeness::INSUFFICIENT;
         }
-        if ($answeredRatio >= 0.7 && $developmental !== Completeness::DEV_MISSING) {
+
+        if ($coreCovered
+            && $blocks['developmental_history_complete']
+            && $blocks['functional_impact_complete']
+            && $answeredRatio >= 0.6) {
             return Completeness::SUFFICIENT;
         }
 
@@ -69,14 +104,29 @@ final class CompletenessEvaluator
     }
 
     /**
+     * @param list<string> $codes
+     */
+    private function countAssessed(ClinicalStructure $structure, array $codes): int
+    {
+        $count = 0;
+        foreach ($codes as $code) {
+            if (($structure->domain($code)?->status ?? DomainStatus::NotAssessed) !== DomainStatus::NotAssessed) {
+                ++$count;
+            }
+        }
+
+        return $count;
+    }
+
+    /**
      * @return list<string>
      */
-    private function collectContradictions(ClinicalStructure $structure): array
+    private function collectDiscrepancies(ClinicalStructure $structure): array
     {
         $out = [];
         foreach ($structure->domains as $summary) {
             if ($summary->status === DomainStatus::Contradictory) {
-                $out[] = \sprintf('Domaine %s : incoherence temporelle entre periodes.', $summary->code);
+                $out[] = \sprintf('Domaine %s : divergence temporelle entre periodes (a clarifier).', $summary->code);
             }
         }
 

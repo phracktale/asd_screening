@@ -12,6 +12,7 @@ declare(strict_types=1);
 require __DIR__ . '/../vendor/autoload.php';
 
 use TsaRepere\Assessment\Assessment;
+use TsaRepere\Assessment\DifferentialStatus;
 use TsaRepere\Assessment\Response;
 use TsaRepere\Form\AgeBand;
 use TsaRepere\Form\CatalogLoader;
@@ -41,6 +42,10 @@ foreach ($form->forAgeBand(AgeBand::Adult) as $q) {
         $responses[] = new Response($q->code, Period::Childhood, 3);
     }
 }
+
+// Camouflage rapporte (section E) et hypothese differentielle en cours (section F).
+$responses[] = Response::ordinal('E.01', Period::Current, 3);
+$responses[] = Response::categorical('F.01', Period::Lifetime, DifferentialStatus::UnderEvaluation, 'bilan TDAH programme');
 
 $assessment = new Assessment(
     id: '11111111-1111-4111-8111-111111111111',

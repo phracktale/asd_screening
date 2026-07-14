@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TsaRepere\Clinical;
 
 use TsaRepere\Assessment\Assessment;
+use TsaRepere\Assessment\DifferentialStatus;
 use TsaRepere\Assessment\Response;
 use TsaRepere\Form\FormDefinition;
 use TsaRepere\Form\Period;
@@ -13,8 +14,9 @@ use TsaRepere\Form\Period;
  * Moteur 2 - Structuration clinique (specification 5.1 et 7.3).
  *
  * Organise les observations par domaine, distingue l'actuel et l'enfance,
- * repere les contradictions temporelles et le retentissement. Il ne valide
- * jamais automatiquement un critere diagnostique.
+ * repere les divergences temporelles et le retentissement, exploite le
+ * camouflage et resume l'incertitude differentielle. Il ne valide jamais
+ * automatiquement un critere diagnostique.
  */
 final class ClinicalStructuringEngine
 {
@@ -22,6 +24,8 @@ final class ClinicalStructuringEngine
     private const int SUPPORT_THRESHOLD = 2;
     /** Intensite marquee ("souvent/marque"). */
     private const int STRONG_THRESHOLD = 3;
+    /** Nombre minimal d'items concordants pour qu'un domaine soit "documente" (review P0-10). */
+    private const int MIN_SUPPORT_FOR_DOCUMENTED = 2;
 
     private const array SOCIAL_RRB_DOMAINS = ['A1', 'A2', 'A3', 'B1', 'B2', 'B3', 'B4'];
 
@@ -34,7 +38,12 @@ final class ClinicalStructuringEngine
         $domains['developmental_onset'] = $this->summariseDevelopmentalOnset($assessment, $form);
         $domains['functional_impact'] = $this->summariseFunctionalImpact($assessment);
 
-        return new ClinicalStructure($domains, $this->differentialExploration($assessment, $form));
+        return new ClinicalStructure(
+            domains: $domains,
+            differentialExploration: $this->differentialExploration($assessment, $form),
+            camouflaging: $this->summariseCamouflage($assessment, $form),
+            differentialUncertainty: $this->differentialUncertainty($assessment, $form),
+        );
     }
 
     private function summariseDomain(Assessment $assessment, FormDefinition $form, string $domainCode): DomainSummary
@@ -44,7 +53,7 @@ final class ClinicalStructuringEngine
         $answeredCurrent = 0;
         $supporting = 0;
         $strong = 0;
-        $contradictions = 0;
+        $discrepancies = 0;
         $sourceRefs = [];
         $hasExample = false;
 
@@ -66,16 +75,16 @@ final class ClinicalStructuringEngine
                 }
             }
 
-            if ($this->isCodeContradictory($responses)) {
-                ++$contradictions;
+            if ($this->isTemporallyDivergent($responses)) {
+                ++$discrepancies;
             }
         }
 
-        if ($answeredCurrent === 0 && $contradictions === 0) {
+        if ($answeredCurrent === 0 && $discrepancies === 0) {
             return new DomainSummary($domainCode, DomainStatus::NotAssessed, DomainSummary::CONFIDENCE_LOW, 0, 0, null, []);
         }
 
-        $status = $this->deriveStatus($answeredCurrent, $supporting, $strong, $contradictions);
+        $status = $this->deriveStatus($answeredCurrent, $supporting, $strong, $discrepancies);
         $confidence = $this->deriveConfidence($supporting, $hasExample, $assessment);
 
         return new DomainSummary(
@@ -83,21 +92,23 @@ final class ClinicalStructuringEngine
             status: $status,
             confidence: $confidence,
             evidenceCount: $supporting,
-            contradictionCount: $contradictions,
+            contradictionCount: $discrepancies,
             summary: $this->domainNarrative($domainCode, $status, $supporting, $answeredCurrent),
             sourceRefs: $sourceRefs,
         );
     }
 
-    private function deriveStatus(int $answered, int $supporting, int $strong, int $contradictions): DomainStatus
+    private function deriveStatus(int $answered, int $supporting, int $strong, int $discrepancies): DomainStatus
     {
-        if ($contradictions > 0) {
-            return DomainStatus::Contradictory;
+        if ($discrepancies > 0) {
+            return DomainStatus::Contradictory; // valeur schema ; libelle "divergence temporelle" en sortie
         }
         if ($answered === 0) {
             return DomainStatus::NotAssessed;
         }
-        if ($strong >= 2 || ($supporting / $answered) >= 0.5) {
+        // Un seul item ne suffit plus a "documenter" un domaine (review P0-10).
+        if ($strong >= self::MIN_SUPPORT_FOR_DOCUMENTED
+            || ($supporting >= self::MIN_SUPPORT_FOR_DOCUMENTED && ($supporting / $answered) >= 0.5)) {
             return DomainStatus::Documented;
         }
         if ($supporting >= 1) {
@@ -144,19 +155,25 @@ final class ClinicalStructuringEngine
         }
 
         if ($answered === 0) {
-            return new DomainSummary('developmental_onset', DomainStatus::NotAssessed, DomainSummary::CONFIDENCE_LOW, 0, 0, 'Aucun element developpemental precoce renseigne.', []);
+            return new DomainSummary('developmental_onset', DomainStatus::NotAssessed, DomainSummary::CONFIDENCE_LOW, 0, 0, 'Aucun element developpemental precoce renseigne. Trame C a completer (voir KNOWN_ISSUES).', []);
         }
 
         $status = match (true) {
-            $supporting >= 2 => DomainStatus::Documented,
+            $supporting >= self::MIN_SUPPORT_FOR_DOCUMENTED => DomainStatus::Documented,
             $supporting >= 1 => DomainStatus::PossiblyDocumented,
             default => DomainStatus::NotDocumented,
         };
-        $confidence = $assessment->hasExternalInformant() && $supporting >= 2
+        $confidence = $assessment->hasExternalInformant() && $supporting >= self::MIN_SUPPORT_FOR_DOCUMENTED
             ? DomainSummary::CONFIDENCE_HIGH
             : ($supporting >= 1 ? DomainSummary::CONFIDENCE_MEDIUM : DomainSummary::CONFIDENCE_LOW);
 
-        return new DomainSummary('developmental_onset', $status, $confidence, $supporting, 0, 'Elements rapportes pour la periode developpementale precoce.', array_values(array_unique($sourceRefs)));
+        $narrative = match ($status) {
+            DomainStatus::Documented => 'Plusieurs elements rapportes pour la periode developpementale precoce.',
+            DomainStatus::PossiblyDocumented => 'Quelques elements rapportes pour la periode developpementale precoce.',
+            default => 'Elements developpementaux precoces renseignes mais peu marques.',
+        };
+
+        return new DomainSummary('developmental_onset', $status, $confidence, $supporting, 0, $narrative, array_values(array_unique($sourceRefs)));
     }
 
     private function summariseFunctionalImpact(Assessment $assessment): DomainSummary
@@ -168,10 +185,7 @@ final class ClinicalStructuringEngine
 
         foreach ($assessment->responses() as $response) {
             $impact = $response->impact;
-            if ($impact === null || $impact === 'unknown' || $impact === 'none') {
-                if ($impact === 'none') {
-                    ++$recorded;
-                }
+            if ($impact === null || $impact === 'unknown') {
                 continue;
             }
             ++$recorded;
@@ -185,7 +199,7 @@ final class ClinicalStructuringEngine
         }
 
         if ($recorded === 0) {
-            return new DomainSummary('functional_impact', DomainStatus::NotAssessed, DomainSummary::CONFIDENCE_LOW, 0, 0, 'Aucun retentissement renseigne.', []);
+            return new DomainSummary('functional_impact', DomainStatus::NotAssessed, DomainSummary::CONFIDENCE_LOW, 0, 0, 'Aucun retentissement renseigne. Trame D a completer (voir KNOWN_ISSUES).', []);
         }
 
         $status = match (true) {
@@ -194,21 +208,77 @@ final class ClinicalStructuringEngine
             default => DomainStatus::NotDocumented,
         };
 
+        // Le resume suit desormais le statut (review P0-11).
+        $narrative = match ($status) {
+            DomainStatus::Documented => 'Retentissement fonctionnel important a majeur rapporte sur au moins un domaine de vie.',
+            DomainStatus::PossiblyDocumented => 'Retentissement fonctionnel modere rapporte.',
+            default => 'Retentissement renseigne mais leger ou absent sur les domaines rapportes.',
+        };
+
         return new DomainSummary(
             'functional_impact',
             $status,
             $strong >= 1 ? DomainSummary::CONFIDENCE_MEDIUM : DomainSummary::CONFIDENCE_LOW,
             $strong + $support,
             0,
-            'Retentissement fonctionnel rapporte sur au moins un domaine de vie.',
+            $narrative,
             array_values(array_unique($sourceRefs)),
+        );
+    }
+
+    /**
+     * Resume du camouflage (section E du catalogue, domaine "camouflaging").
+     * Il ne fait jamais monter la suspicion a lui seul (specification 6.8) ; il
+     * sert a interpreter l'absence apparente de signes observables (review P1-7).
+     */
+    private function summariseCamouflage(Assessment $assessment, FormDefinition $form): ?DomainSummary
+    {
+        $codes = $this->codesForDomain($form, 'camouflaging');
+        if ($codes === []) {
+            return null;
+        }
+
+        $answered = 0;
+        $supporting = 0;
+        $sourceRefs = [];
+        foreach ($codes as $code) {
+            $current = $this->firstForPeriod($assessment->responsesForCode($code), Period::Current);
+            if ($current === null || !$current->isAnswered()) {
+                continue;
+            }
+            ++$answered;
+            if ($current->intensity() >= self::SUPPORT_THRESHOLD) {
+                ++$supporting;
+                $sourceRefs[] = $code;
+            }
+        }
+
+        if ($answered === 0) {
+            return new DomainSummary('camouflaging', DomainStatus::NotAssessed, DomainSummary::CONFIDENCE_LOW, 0, 0, 'Camouflage non evalue.', []);
+        }
+
+        $status = match (true) {
+            $supporting >= self::MIN_SUPPORT_FOR_DOCUMENTED => DomainStatus::Documented,
+            $supporting >= 1 => DomainStatus::PossiblyDocumented,
+            default => DomainStatus::NotDocumented,
+        };
+
+        return new DomainSummary(
+            'camouflaging',
+            $status,
+            $supporting >= 1 ? DomainSummary::CONFIDENCE_MEDIUM : DomainSummary::CONFIDENCE_LOW,
+            $supporting,
+            0,
+            'Strategies de compensation / camouflage rapportees. A prendre en compte pour interpreter une faible visibilite des signes.',
+            $sourceRefs,
         );
     }
 
     /**
      * Exploration differentielle (section F du catalogue, domaine "differential").
      * Le formulaire ne diagnostique pas ces troubles ; il repere les domaines a
-     * explorer (specification 6.9). Les reponses attendues sont known/suspected/no/unknown.
+     * explorer (specification 6.9). Le statut provient d'une reponse categorielle
+     * typee (plus aucune lecture depuis le texte libre, review P0-2).
      *
      * @return list<array{code: string, status: string, comment: ?string}>
      */
@@ -219,32 +289,67 @@ final class ClinicalStructuringEngine
             if ($question->domain !== 'differential') {
                 continue;
             }
-            $responses = $assessment->responsesForCode($question->code);
-            $status = 'not_reported';
-            foreach ($responses as $response) {
-                // Les items differentiels utilisent une echelle categorielle stockee
-                // dans example (voir note d'incoherence CSV/schema dans le README).
-                $raw = strtolower((string) $response->example);
-                $status = match (true) {
-                    str_contains($raw, 'known') || str_contains($raw, 'connu') => 'known',
-                    str_contains($raw, 'suspected') || str_contains($raw, 'suspect') => 'suspected',
-                    str_contains($raw, 'unknown') || str_contains($raw, 'inconnu') => 'unknown',
-                    default => $status,
-                };
+            $status = DifferentialStatus::NotReported;
+            $comment = null;
+            foreach ($assessment->responsesForCode($question->code) as $response) {
+                $parsed = $response->differentialStatus();
+                if ($parsed !== null) {
+                    $status = $parsed;
+                    $comment = $response->example;
+                }
             }
-            $out[] = ['code' => $question->code, 'status' => $status, 'comment' => $question->labelFr];
+            $out[] = [
+                'code' => $question->code,
+                'status' => $status->value,
+                'comment' => $comment ?? $question->labelFr,
+            ];
         }
 
         return $out;
     }
 
+    private function differentialUncertainty(Assessment $assessment, FormDefinition $form): DifferentialUncertainty
+    {
+        $unresolved = 0;
+        $suspected = 0;
+        $diagnosed = 0;
+
+        foreach ($form->questions as $question) {
+            if ($question->domain !== 'differential') {
+                continue;
+            }
+            foreach ($assessment->responsesForCode($question->code) as $response) {
+                $status = $response->differentialStatus();
+                if ($status === null) {
+                    continue;
+                }
+                if ($status->isUnresolved()) {
+                    ++$unresolved;
+                } elseif ($status->isSuspected()) {
+                    ++$suspected;
+                } elseif ($status === DifferentialStatus::Diagnosed) {
+                    ++$diagnosed;
+                }
+            }
+        }
+
+        return match (true) {
+            $unresolved >= 1 => DifferentialUncertainty::Unresolved,
+            $suspected >= 1 => DifferentialUncertainty::Significant,
+            $diagnosed >= 1 => DifferentialUncertainty::Limited,
+            default => DifferentialUncertainty::None,
+        };
+    }
+
     /**
-     * Contradiction temporelle : le meme item est declare marque (>=3) pour une
-     * periode et explicitement absent (0) pour une autre.
+     * Divergence temporelle (anciennement "contradiction", review P1-8) : le meme
+     * item est declare marque (>=3) pour une periode et explicitement absent (0)
+     * pour une autre. Ce n'est pas necessairement une contradiction (evolution,
+     * compensation, contexte) mais un point a clarifier en entretien.
      *
      * @param list<Response> $responses
      */
-    private function isCodeContradictory(array $responses): bool
+    private function isTemporallyDivergent(array $responses): bool
     {
         $max = null;
         $min = null;
@@ -295,7 +400,7 @@ final class ClinicalStructuringEngine
             DomainStatus::Documented => \sprintf('Domaine %s : elements convergents (%d/%d items marques).', $domainCode, $supporting, $answered),
             DomainStatus::PossiblyDocumented => \sprintf('Domaine %s : quelques elements rapportes (%d/%d).', $domainCode, $supporting, $answered),
             DomainStatus::NotDocumented => \sprintf('Domaine %s : peu ou pas d\'elements marques.', $domainCode),
-            DomainStatus::Contradictory => \sprintf('Domaine %s : reponses contradictoires entre periodes, a clarifier en entretien.', $domainCode),
+            DomainStatus::Contradictory => \sprintf('Domaine %s : divergence temporelle entre periodes, a clarifier en entretien.', $domainCode),
             DomainStatus::NotAssessed => \sprintf('Domaine %s : non evalue.', $domainCode),
         };
     }
